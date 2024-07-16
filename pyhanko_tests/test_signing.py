@@ -1512,7 +1512,7 @@ def test_ed448():
     r = PdfFileReader(out)
     s = r.embedded_signatures[0]
     status = val_untrusted(s)
-    assert status.md_algorithm == 'shake256'
+    assert status.md_algorithm == 'shake256_len'
 
     assert len(s.external_digest) == 64
 
@@ -1521,6 +1521,20 @@ def test_ed448():
         32001,
         32002,
     }
+
+
+@freeze_time('2020-11-01')
+def test_ed448_no_length():
+    # verify that we still accept ed448 with id-shake256 without paramaters
+
+    fname = os.path.join(PDF_DATA_DIR, 'ed448-shake256-nolen.pdf')
+    with open(fname, 'rb') as inf:
+        r = PdfFileReader(inf)
+        s = r.embedded_signatures[0]
+        status = val_untrusted(s)
+    assert status.md_algorithm == 'shake256'
+
+    assert len(s.external_digest) == 64
 
 
 @freeze_time('2020-11-01')
